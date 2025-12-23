@@ -1,0 +1,348 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>HighAgentsBackend</name>
+    </assembly>
+    <members>
+        <member name="T:HighAgentsBackend.Controllers.ChatController">
+            <summary>
+            Controller para gerenciar interações de chat com o agente de IA
+            </summary>
+        </member>
+        <member name="M:HighAgentsBackend.Controllers.ChatController.#ctor(AgentService)">
+            <summary>
+            Construtor do ChatController
+            </summary>
+            <param name="agentService">Serviço do agente de IA</param>
+        </member>
+        <member name="M:HighAgentsBackend.Controllers.ChatController.StartConversation">
+            <summary>
+            Inicia uma nova conversa com o agente de IA
+            </summary>
+            <returns>ID da conversa criada</returns>
+        </member>
+        <member name="M:HighAgentsBackend.Controllers.ChatController.SendMessage(HighAgentsBackend.Controllers.SendMessageRequest)">
+            <summary>
+            Envia uma mensagem para o agente de IA e recebe a resposta
+            </summary>
+            <param name="request">Requisição contendo ID da conversa e mensagem</param>
+            <returns>Resposta do agente de IA</returns>
+        </member>
+        <member name="M:HighAgentsBackend.Controllers.ChatController.Test(HighAgentsBackend.Controllers.TestRequest)">
+            <summary>
+            Endpoint de teste para verificar se a API está funcionando
+            </summary>
+            <param name="request">Requisição de teste</param>
+            <returns>Confirmação de recebimento</returns>
+        </member>
+        <member name="M:HighAgentsBackend.Controllers.ChatController.GetConversation(System.String)">
+            <summary>
+            Obtém os detalhes de uma conversa específica
+            </summary>
+            <param name="conversationId">ID da conversa</param>
+            <returns>Detalhes da conversa</returns>
+        </member>
+        <member name="T:HighAgentsBackend.Controllers.SendMessageRequest">
+            <summary>
+            Modelo de requisição para envio de mensagem
+            </summary>
+        </member>
+        <member name="P:HighAgentsBackend.Controllers.SendMessageRequest.ConversationId">
+            <summary>
+            ID da conversa
+            </summary>
+        </member>
+        <member name="P:HighAgentsBackend.Controllers.SendMessageRequest.Message">
+            <summary>
+            Conteúdo da mensagem
+            </summary>
+        </member>
+        <member name="T:HighAgentsBackend.Controllers.TestRequest">
+            <summary>
+            Modelo de requisição para teste da API
+            </summary>
+        </member>
+        <member name="P:HighAgentsBackend.Controllers.TestRequest.ConversationId">
+            <summary>
+            ID da conversa
+            </summary>
+        </member>
+        <member name="P:HighAgentsBackend.Controllers.TestRequest.Message">
+            <summary>
+            Conteúdo da mensagem
+            </summary>
+        </member>
+        <member name="T:HighAgentsBackend.Models.Conversation">
+            <summary>
+            Representa uma conversa com o agente de IA
+            Contém histórico de mensagens, slots preenchidos e estado da conversa
+            </summary>
+        </member>
+        <member name="P:HighAgentsBackend.Models.Conversation.Id">
+            <summary>
+            ID único da conversa
+            </summary>
+        </member>
+        <member name="P:HighAgentsBackend.Models.Conversation.Messages">
+            <summary>
+            Lista de mensagens trocadas na conversa
+            </summary>
+        </member>
+        <member name="P:HighAgentsBackend.Models.Conversation.Slots">
+            <summary>
+            Dicionário com informações extraídas da conversa (slots)
+            Ex: nome, procedimento, unidade, data, horário
+            </summary>
+        </member>
+        <member name="P:HighAgentsBackend.Models.Conversation.CurrentStep">
+            <summary>
+            Etapa atual do fluxo de agendamento (0-4)
+            </summary>
+        </member>
+        <member name="P:HighAgentsBackend.Models.Conversation.IsCompleted">
+            <summary>
+            Indica se a conversa foi concluída com sucesso
+            </summary>
+        </member>
+        <member name="T:HighAgentsBackend.Models.Message">
+            <summary>
+            Representa uma mensagem na conversa
+            Pode ser do usuário ou do assistente
+            </summary>
+        </member>
+        <member name="P:HighAgentsBackend.Models.Message.Role">
+            <summary>
+            Papel do emissor da mensagem: "user" ou "assistant"
+            </summary>
+        </member>
+        <member name="P:HighAgentsBackend.Models.Message.Content">
+            <summary>
+            Conteúdo da mensagem
+            </summary>
+        </member>
+        <member name="P:HighAgentsBackend.Models.Message.Timestamp">
+            <summary>
+            Data e hora em que a mensagem foi criada
+            </summary>
+        </member>
+        <member name="T:HighAgentsBackend.Services.OpenAIService">
+            <summary>
+            Serviço para integração com a API da OpenAI
+            Gerencia chamadas para GPT-4o e GPT-3.5-turbo com suporte a function calling
+            </summary>
+        </member>
+        <member name="M:HighAgentsBackend.Services.OpenAIService.GetChatCompletionWithToolsAsync(System.String,System.Collections.Generic.List{HighAgentsBackend.Models.Message},System.Collections.Generic.List{HighAgentsBackend.Services.Tool})">
+            <summary>
+            Obtém resposta do chat GPT com suporte a ferramentas (function calling)
+            </summary>
+            <param name="prompt">Prompt do sistema (não usado diretamente)</param>
+            <param name="messages">Histórico de mensagens da conversa</param>
+            <param name="tools">Lista de ferramentas disponíveis</param>
+            <returns>Tupla com resposta e chamadas de ferramentas</returns>
+        </member>
+        <member name="M:HighAgentsBackend.Services.OpenAIService.GetChatCompletionAsync(System.String,System.Collections.Generic.List{HighAgentsBackend.Models.Message})">
+            <summary>
+            Obtém resposta simples do chat GPT (sem ferramentas)
+            </summary>
+        </member>
+        <member name="M:HighAgentsBackend.Services.OpenAIService.GetEmbeddingAsync(System.String)">
+            <summary>
+            Gera embedding vetorial para um texto usando OpenAI
+            </summary>
+            <param name="text">Texto para gerar embedding</param>
+            <returns>Array de floats representando o embedding</returns>
+        </member>
+        <member name="M:HighAgentsBackend.Services.OpenAIService.GetChatCompletionWithToolsFallbackAsync(System.String,System.Collections.Generic.List{HighAgentsBackend.Models.Message},System.Collections.Generic.List{HighAgentsBackend.Services.Tool})">
+            <summary>
+            Método de fallback que usa GPT-3.5-turbo quando GPT-4o falha por quota
+            </summary>
+        </member>
+        <member name="T:HighAgentsBackend.Services.PineconeService">
+            <summary>
+            Serviço para integração com Pinecone (banco de dados vetorial)
+            Gerencia armazenamento e recuperação de memórias de longo prazo
+            </summary>
+        </member>
+        <member name="M:HighAgentsBackend.Services.PineconeService.UpsertAsync(System.String,System.String)">
+            <summary>
+            Armazena um vetor no índice Pinecone
+            </summary>
+            <param name="text">Texto para gerar embedding e armazenar</param>
+            <param name="id">ID único do vetor</param>
+        </member>
+        <member name="M:HighAgentsBackend.Services.PineconeService.QueryAsync(System.String)">
+            <summary>
+            Consulta vetores similares no índice Pinecone
+            </summary>
+            <param name="query">Texto para buscar vetores similares</param>
+            <returns>Texto relevante encontrado na busca</returns>
+        </member>
+        <member name="M:HighAgentsBackend.Services.PineconeService.GetEmbeddingAsync(System.String)">
+            <summary>
+            Gera embedding para um texto usando OpenAI
+            </summary>
+        </member>
+        <member name="T:HighAgentsBackend.Tests.AgentServiceTests">
+            <summary>
+            Testes unitários para o serviço AgentService
+            </summary>
+        </member>
+        <member name="M:HighAgentsBackend.Tests.AgentServiceTests.ProcessMessageAsync_ShouldUpdateSlots">
+            <summary>
+            Testa se o processamento de mensagens atualiza os slots corretamente
+            </summary>
+        </member>
+        <member name="M:HighAgentsBackend.Tests.AgentServiceTests.UpdateConversationState_ShouldAdvanceStep">
+            <summary>
+            Testa se o avanço de etapas funciona corretamente
+            </summary>
+        </member>
+        <member name="T:Program">
+            <summary>
+            Auto-generated public partial Program class for top-level statement apps.
+            </summary>
+        </member>
+        <member name="T:AgentService">
+            <summary>
+            Serviço responsável por orquestrar a conversa com o agente de IA
+            Gerencia o fluxo de agendamento médico e integração com ferramentas externas
+            </summary>
+        </member>
+        <member name="M:AgentService.ProcessMessageAsync(HighAgentsBackend.Models.Conversation,System.String)">
+            <summary>
+            Processa uma mensagem do usuário e retorna a resposta do agente
+            </summary>
+            <param name="conversation">Conversa atual</param>
+            <param name="userMessage">Mensagem do usuário</param>
+            <returns>Resposta do agente</returns>
+        </member>
+        <member name="M:AgentService.GetTools">
+            <summary>
+            Define as ferramentas disponíveis para o agente de IA
+            </summary>
+            <returns>Lista de ferramentas configuradas</returns>
+        </member>
+        <member name="M:AgentService.ExecuteToolAsync(HighAgentsBackend.Services.ToolCall)">
+            <summary>
+            Executa uma ferramenta chamada pelo agente de IA
+            </summary>
+            <param name="toolCall">Informações da chamada da ferramenta</param>
+            <returns>Resultado da execução da ferramenta</returns>
+        </member>
+        <member name="M:AgentService.CheckAvailabilityAsync(CheckAvailabilityArgs)">
+            <summary>
+            Verifica disponibilidade de horários (implementação mock)
+            </summary>
+        </member>
+        <member name="M:AgentService.ScheduleAppointmentAsync(ScheduleAppointmentArgs)">
+            <summary>
+            Agenda um procedimento (implementação mock)
+            </summary>
+        </member>
+        <member name="M:AgentService.SendConfirmationAsync(SendConfirmationArgs)">
+            <summary>
+            Envia confirmação para o paciente (implementação mock)
+            </summary>
+        </member>
+        <member name="M:AgentService.GetSystemPrompt(HighAgentsBackend.Models.Conversation)">
+            <summary>
+            Monta o prompt do sistema baseado no estado da conversa
+            </summary>
+        </member>
+        <member name="M:AgentService.GetRelevantKnowledgeAsync(System.String)">
+            <summary>
+            Busca conhecimento relevante na base de dados vetorial
+            </summary>
+        </member>
+        <member name="M:AgentService.UpdateConversationState(HighAgentsBackend.Models.Conversation,System.String,System.String)">
+            <summary>
+            Atualiza o estado da conversa baseado nas mensagens
+            Preenche slots automaticamente e avança etapas
+            </summary>
+        </member>
+        <member name="M:AgentService.ExtractName(System.String)">
+            <summary>
+            Extrai o nome do paciente da mensagem (implementação simples)
+            </summary>
+        </member>
+        <member name="M:AgentService.ExtractProcedure(System.String)">
+            <summary>
+            Extrai o tipo de procedimento da mensagem
+            </summary>
+        </member>
+        <member name="M:AgentService.ExtractUnit(System.String)">
+            <summary>
+            Extrai a unidade da mensagem (implementação mock)
+            </summary>
+        </member>
+        <member name="M:AgentService.ExtractDate(System.String)">
+            <summary>
+            Extrai a data da mensagem (implementação mock)
+            </summary>
+        </member>
+        <member name="M:AgentService.ExtractTime(System.String)">
+            <summary>
+            Extrai o horário da mensagem (implementação mock)
+            </summary>
+        </member>
+        <member name="M:AgentService.StoreInMemoryAsync(HighAgentsBackend.Models.Conversation)">
+            <summary>
+            Armazena um resumo da conversa na memória de longo prazo
+            </summary>
+        </member>
+        <member name="T:CheckAvailabilityArgs">
+            <summary>
+            Argumentos para verificação de disponibilidade
+            </summary>
+        </member>
+        <member name="T:ScheduleAppointmentArgs">
+            <summary>
+            Argumentos para agendamento de procedimento
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type)">
+            <summary>
+            Generates a documentation comment ID for a type.
+            Example: T:Namespace.Outer+Inner`1 becomes T:Namespace.Outer.Inner`1
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Reflection.PropertyInfo)">
+            <summary>
+            Generates a documentation comment ID for a property.
+            Example: P:Namespace.ContainingType.PropertyName or for an indexer P:Namespace.ContainingType.Item(System.Int32)
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type,System.String)">
+            <summary>
+            Generates a documentation comment ID for a property given its container type and property name.
+            Example: P:Namespace.ContainingType.PropertyName
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Reflection.MethodInfo)">
+            <summary>
+            Generates a documentation comment ID for a method (or constructor).
+            For example:
+              M:Namespace.ContainingType.MethodName(ParamType1,ParamType2)~ReturnType
+              M:Namespace.ContainingType.#ctor(ParamType)
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.GetTypeDocId(System.Type,System.Boolean,System.Boolean)">
+            <summary>
+            Generates a documentation ID string for a type.
+            This method handles nested types (replacing '+' with '.'),
+            generic types, arrays, pointers, by-ref types, and generic parameters.
+            The <paramref name="includeGenericArguments"/> flag controls whether
+            constructed generic type arguments are emitted, while <paramref name="omitGenericArity"/>
+            controls whether the generic arity marker (e.g. "`1") is appended.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.NormalizeDocId(System.String)">
+            <summary>
+            Normalizes a documentation comment ID to match the compiler-style format.
+            Strips the return type suffix for ordinary methods but retains it for conversion operators.
+            </summary>
+            <param name="docId">The documentation comment ID to normalize.</param>
+            <returns>The normalized documentation comment ID.</returns>
+        </member>
+    </members>
+</doc>
