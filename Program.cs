@@ -13,6 +13,31 @@ builder.Logging.AddConsole();
 // Adiciona serviços da API
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+
+// Configura CORS para permitir requisições do frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        // Em desenvolvimento, permite qualquer origem
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        }
+        else
+        {
+            // Em produção, usa origens específicas do appsettings.json
+            var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:3000" };
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials();
+        }
+    });
+});
+
 builder.Services.AddSwaggerGen(c =>
 {
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -38,6 +63,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Habilita CORS antes de MapControllers
+app.UseCors("AllowFrontend");
+
 app.MapControllers();
 
 app.Run();

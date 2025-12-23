@@ -28,6 +28,12 @@
             <param name="request">Requisição contendo ID da conversa e mensagem</param>
             <returns>Resposta do agente de IA</returns>
         </member>
+        <member name="M:HighAgentsBackend.Controllers.ChatController.Health">
+            <summary>
+            Endpoint de health check para verificar se a API está funcionando
+            </summary>
+            <returns>Status da API</returns>
+        </member>
         <member name="M:HighAgentsBackend.Controllers.ChatController.Test(HighAgentsBackend.Controllers.TestRequest)">
             <summary>
             Endpoint de teste para verificar se a API está funcionando
