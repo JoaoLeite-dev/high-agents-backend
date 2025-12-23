@@ -244,10 +244,6 @@ Execute `dotnet test` para rodar os testes unitários.
 - `POST /api/chat/send`: Envia mensagem e recebe resposta.
 - `GET /api/chat/{conversationId}`: Obtém detalhes da conversa.
 
-- `POST /api/chat/start`: Inicia conversa.
-- `POST /api/chat/send`: Envia mensagem.
-- `GET /api/chat/{id}`: Obtém conversa.
-
 ## Arquivos
 
 - Código fonte em `Controllers/`, `Services/`, `Models/`.
