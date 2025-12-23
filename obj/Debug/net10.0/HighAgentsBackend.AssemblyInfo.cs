@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HighAgentsBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2c2582f66e7b96dfefb2a8b5b56f0a682b2ceca8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a2a7b9a68e5162663730ba65851df35c606e1f12")]
 [assembly: System.Reflection.AssemblyProductAttribute("HighAgentsBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HighAgentsBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

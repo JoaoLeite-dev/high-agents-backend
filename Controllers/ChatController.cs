@@ -33,7 +33,11 @@ public class ChatController : ControllerBase
     {
         var conversation = new Conversation();
         _conversations[conversation.Id] = conversation;
-        return Ok(new { conversationId = conversation.Id });
+        return Ok(new { 
+            success = true, 
+            conversationId = conversation.Id,
+            message = "Conversa iniciada com sucesso"
+        });
     }
 
     /// <summary>
@@ -46,26 +50,52 @@ public class ChatController : ControllerBase
     {
         if (request == null)
         {
-            return BadRequest("Corpo da requisição é obrigatório");
+            return BadRequest(new { 
+                success = false, 
+                message = "Corpo da requisição é obrigatório" 
+            });
         }
 
         if (string.IsNullOrEmpty(request.ConversationId))
         {
-            return BadRequest("ConversationId é obrigatório");
+            return BadRequest(new { 
+                success = false, 
+                message = "ConversationId é obrigatório" 
+            });
         }
 
         if (string.IsNullOrEmpty(request.Message))
         {
-            return BadRequest("Mensagem é obrigatória");
+            return BadRequest(new { 
+                success = false, 
+                message = "Mensagem é obrigatória" 
+            });
         }
 
         if (!_conversations.TryGetValue(request.ConversationId, out var conversation))
         {
-            return NotFound("Conversa não encontrada");
+            return NotFound(new { 
+                success = false, 
+                message = "Conversa não encontrada" 
+            });
         }
 
         var response = await _agentService.ProcessMessageAsync(conversation, request.Message);
-        return Ok(new { response });
+        return Ok(new { 
+            success = true, 
+            message = response, 
+            conversationId = request.ConversationId 
+        });
+    }
+
+    /// <summary>
+    /// Endpoint de health check para verificar se a API está funcionando
+    /// </summary>
+    /// <returns>Status da API</returns>
+    [HttpGet("health")]
+    public IActionResult Health()
+    {
+        return Ok(new { status = "healthy", timestamp = DateTime.UtcNow });
     }
 
     /// <summary>
@@ -76,7 +106,13 @@ public class ChatController : ControllerBase
     [HttpPost("test")]
     public IActionResult Test([FromBody] TestRequest request)
     {
-        return Ok(new { received = request != null, conversationId = request?.ConversationId, message = request?.Message });
+        return Ok(new { 
+            success = true,
+            received = request != null, 
+            conversationId = request?.ConversationId, 
+            message = request?.Message,
+            timestamp = DateTime.UtcNow
+        });
     }
 
     /// <summary>
@@ -89,10 +125,16 @@ public class ChatController : ControllerBase
     {
         if (!_conversations.TryGetValue(conversationId, out var conversation))
         {
-            return NotFound("Conversa não encontrada");
+            return NotFound(new { 
+                success = false, 
+                message = "Conversa não encontrada" 
+            });
         }
 
-        return Ok(conversation);
+        return Ok(new { 
+            success = true, 
+            conversation = conversation 
+        });
     }
 }
 
