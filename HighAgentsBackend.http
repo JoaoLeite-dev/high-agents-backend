@@ -4,3 +4,24 @@ GET {{HighAgentsBackend_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+# Iniciar conversa
+POST {{HighAgentsBackend_HostAddress}}/api/chat/start
+Content-Type: application/json
+
+###
+
+# Enviar mensagem
+POST {{HighAgentsBackend_HostAddress}}/api/chat/send
+Content-Type: application/json
+
+{
+  "conversationId": "your-conversation-id-here",
+  "message": "Olá, quero agendar uma consulta"
+}
+
+###
+
+# Obter conversa
+GET {{HighAgentsBackend_HostAddress}}/api/chat/your-conversation-id-here
+Accept: application/json

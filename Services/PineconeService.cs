@@ -4,6 +4,10 @@ using System.Text;
 
 namespace HighAgentsBackend.Services;
 
+/// <summary>
+/// Serviço para integração com Pinecone (banco de dados vetorial)
+/// Gerencia armazenamento e recuperação de memórias de longo prazo
+/// </summary>
 public class PineconeService
 {
     private readonly HttpClient _httpClient;
@@ -19,9 +23,16 @@ public class PineconeService
         _apiKey = Environment.GetEnvironmentVariable("PINECONE_API_KEY") ?? "";
         _indexName = Environment.GetEnvironmentVariable("PINECONE_INDEX_NAME") ?? "high-agents-memory";
         _environment = Environment.GetEnvironmentVariable("PINECONE_ENVIRONMENT") ?? "us-east1-gcp";
+        Console.WriteLine($"Chave da API Pinecone carregada: {!string.IsNullOrEmpty(_apiKey)}");
+        Console.WriteLine($"Índice Pinecone: {_indexName}, Ambiente: {_environment}");
         _httpClient.DefaultRequestHeaders.Add("Api-Key", _apiKey);
     }
 
+    /// <summary>
+    /// Armazena um vetor no índice Pinecone
+    /// </summary>
+    /// <param name="text">Texto para gerar embedding e armazenar</param>
+    /// <param name="id">ID único do vetor</param>
     public async Task UpsertAsync(string text, string id)
     {
         try
@@ -29,7 +40,7 @@ public class PineconeService
             var embedding = await GetEmbeddingAsync(text);
             if (embedding.Length == 0)
             {
-                Console.WriteLine("Pinecone: Skipping upsert due to embedding failure");
+                Console.WriteLine("Pinecone: Pulando upsert devido a falha no embedding");
                 return;
             }
 
@@ -52,19 +63,24 @@ public class PineconeService
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Pinecone upsert error: {response.StatusCode} - {errorContent}");
+                Console.WriteLine($"Erro no upsert Pinecone: {response.StatusCode} - {errorContent}");
                 return;
             }
 
-            Console.WriteLine($"Pinecone: Successfully upserted vector for {id}");
+            Console.WriteLine($"Pinecone: Vetor inserido com sucesso para {id}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Pinecone upsert error: {ex.Message}");
-            // Continue without throwing - memory operations are not critical
+            Console.WriteLine($"Erro no upsert Pinecone: {ex.Message}");
+            // Continua sem lançar exceção - operações de memória não são críticas
         }
     }
 
+    /// <summary>
+    /// Consulta vetores similares no índice Pinecone
+    /// </summary>
+    /// <param name="query">Texto para buscar vetores similares</param>
+    /// <returns>Texto relevante encontrado na busca</returns>
     public async Task<string> QueryAsync(string query)
     {
         try
@@ -72,7 +88,7 @@ public class PineconeService
             var embedding = await GetEmbeddingAsync(query);
             if (embedding.Length == 0)
             {
-                Console.WriteLine("Pinecone: Skipping query due to embedding failure");
+                Console.WriteLine("Pinecone: Pulando consulta devido a falha no embedding");
                 return "";
             }
 
@@ -89,7 +105,7 @@ public class PineconeService
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Pinecone query error: {response.StatusCode} - {errorContent}");
+                Console.WriteLine($"Erro na consulta Pinecone: {response.StatusCode} - {errorContent}");
                 return "";
             }
 
@@ -103,17 +119,20 @@ public class PineconeService
                 relevant += match.GetProperty("metadata").GetProperty("text").GetString() + "\n";
             }
 
-            Console.WriteLine($"Pinecone: Found {matches.GetArrayLength()} relevant matches");
+            Console.WriteLine($"Pinecone: Encontrados {matches.GetArrayLength()} resultados relevantes");
             return relevant;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Pinecone query error: {ex.Message}");
-            // Return empty if Pinecone is not configured or fails
+            Console.WriteLine($"Erro na consulta Pinecone: {ex.Message}");
+            // Retorna vazio se Pinecone não estiver configurado ou falhar
             return "";
         }
     }
 
+    /// <summary>
+    /// Gera embedding para um texto usando OpenAI
+    /// </summary>
     private async Task<float[]> GetEmbeddingAsync(string text)
     {
         return await _openAIService.GetEmbeddingAsync(text);
